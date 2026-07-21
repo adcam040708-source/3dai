@@ -12,6 +12,8 @@ import {
   Boxes,
   Camera,
   ChevronRight,
+  ClipboardCopy,
+  Download,
   Expand,
   Grid2X2,
   Grid3X3,
@@ -22,6 +24,7 @@ import {
   Route,
   Rotate3D,
   Scale3D,
+  Sparkles,
   Trash2,
   UserPlus,
   Video,
@@ -29,6 +32,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { requestViewportCapture } from "../io/captureBridge";
+import { exportAllShotPrompts, type ShotPromptEntry } from "../io/shotPromptExporter";
 import { readLocalModelFile } from "../loaders/localModelImport";
 import {
   inspectCharacterModelFile,
@@ -138,6 +142,10 @@ export function ViewportToolbar({
   const [crowdPanelOpen, setCrowdPanelOpen] = useState(false);
   const [modelLibraryOpen, setModelLibraryOpen] = useState(false);
   const [aspectRatioPanelOpen, setAspectRatioPanelOpen] = useState(false);
+  const [aiPromptPanelOpen, setAiPromptPanelOpen] = useState(false);
+  const [aiPromptEntries, setAiPromptEntries] = useState<ShotPromptEntry[]>([]);
+  const [copiedShotId, setCopiedShotId] = useState<string | null>(null);
+  const aiPromptPanelRef = useRef<HTMLDivElement | null>(null);
   const [pendingCharacterImport, setPendingCharacterImport] = useState<{
     file: File;
     report: CharacterAssetInspection;
@@ -187,6 +195,43 @@ export function ViewportToolbar({
   const setShowCharacterRoutes = useDirectorStore((state) => state.setShowCharacterRoutes);
   const setViewportAspectRatio = useDirectorStore((state) => state.setViewportAspectRatio);
   const toggleViewportPanelsCollapsed = useDirectorStore((state) => state.toggleViewportPanelsCollapsed);
+  const project = useDirectorStore((state) => state.project);
+
+  function openAiPromptPanel() {
+    const entries = exportAllShotPrompts(project);
+    setAiPromptEntries(entries);
+    setAiPromptPanelOpen(true);
+    setCharacterMenuOpen(false);
+    setGeometryMenuOpen(false);
+    setCrowdPanelOpen(false);
+    setModelLibraryOpen(false);
+    setAspectRatioPanelOpen(false);
+  }
+
+  function closeAiPromptPanel() {
+    setAiPromptPanelOpen(false);
+    setCopiedShotId(null);
+  }
+
+  async function copyPromptText(entry: ShotPromptEntry) {
+    try {
+      await navigator.clipboard.writeText(entry.promptText);
+      setCopiedShotId(entry.shotId);
+      window.setTimeout(() => setCopiedShotId((id) => (id === entry.shotId ? null : id)), 2000);
+    } catch {
+      // clipboard not available
+    }
+  }
+
+  function downloadAllPromptsJson(entries: ShotPromptEntry[]) {
+    const blob = new Blob([JSON.stringify(entries, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "shot-prompts.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  }
 
   function stopCharacterImportPreview() {
     setCharacterImportPreviewState(null);
@@ -239,7 +284,7 @@ export function ViewportToolbar({
   }, [setCharacterActionPreview]);
 
   useEffect(() => {
-    if (!characterMenuOpen && !crowdPanelOpen && !modelLibraryOpen && !aspectRatioPanelOpen) return;
+    if (!characterMenuOpen && !crowdPanelOpen && !modelLibraryOpen && !aspectRatioPanelOpen && !aiPromptPanelOpen) return;
 
     function closeMenusOnOutsidePointerDown(event: PointerEvent) {
       if (event.target instanceof Node && toolbarRef.current?.contains(event.target)) return;
@@ -248,6 +293,7 @@ export function ViewportToolbar({
       if (event.target instanceof Node && crowdPanelRef.current?.contains(event.target)) return;
       if (event.target instanceof Node && modelLibraryPanelRef.current?.contains(event.target)) return;
       if (event.target instanceof Node && aspectRatioPanelRef.current?.contains(event.target)) return;
+      if (event.target instanceof Node && aiPromptPanelRef.current?.contains(event.target)) return;
       if (event.target instanceof Node && sceneLocalModelInputRef.current?.contains(event.target)) return;
       if (event.target instanceof Node && characterLocalModelInputRef.current?.contains(event.target)) return;
       if (event.target instanceof Node && libraryLocalModelInputRef.current?.contains(event.target)) return;
@@ -257,6 +303,7 @@ export function ViewportToolbar({
       setCrowdPanelOpen(false);
       setModelLibraryOpen(false);
       setAspectRatioPanelOpen(false);
+      setAiPromptPanelOpen(false);
     }
 
     document.addEventListener("pointerdown", closeMenusOnOutsidePointerDown);
@@ -651,6 +698,7 @@ export function ViewportToolbar({
     { label: "当前视角截图", icon: Camera, onClick: () => void handleCapture("current") },
     { label: "四方位截图", icon: Grid2X2, onClick: () => void handleCapture("four") },
     { label: "十二方位截图", icon: Grid3X3, onClick: () => void handleCapture("twelve") },
+    { label: "导出 AI 提示词", icon: Sparkles, onClick: openAiPromptPanel },
     { label: "全屏", icon: Expand, onClick: toggleViewportPanelsCollapsed },
   ];
 
@@ -1061,6 +1109,115 @@ export function ViewportToolbar({
                 </button>
               );
             })}
+          </div>
+        </div>
+      ) : null}
+      {aiPromptPanelOpen ? (
+        <div
+          ref={aiPromptPanelRef}
+          className="model-library-panel"
+          role="dialog"
+          aria-label="AI 提示词导出"
+          style={{
+            left: "50%",
+            bottom: `${toolbarHeight + 10}px`,
+            transform: "translateX(-50%)",
+            maxHeight: "70vh",
+            width: "720px",
+            maxWidth: "90vw",
+          }}
+        >
+          <div className="model-library-header">
+            <h2 className="model-library-title">AI 提示词导出</h2>
+            <button
+              aria-label="下载全部 JSON"
+              className="top-bar-action-button"
+              type="button"
+              title="下载所有镜头的结构化 JSON"
+              onClick={() => downloadAllPromptsJson(aiPromptEntries)}
+            >
+              <Download aria-hidden="true" size={16} strokeWidth={1.8} />
+            </button>
+            <button
+              aria-label="关闭"
+              className="top-bar-action-button model-library-close-button"
+              type="button"
+              onClick={closeAiPromptPanel}
+            >
+              <X aria-hidden="true" size={16} strokeWidth={1.8} />
+            </button>
+          </div>
+          <div style={{ padding: "16px", overflowY: "auto", maxHeight: "calc(70vh - 60px)" }}>
+            {aiPromptEntries.length === 0 ? (
+              <div className="model-library-empty-state" role="status" aria-label="暂无镜头">
+                <span className="object-search-empty-icon">
+                  <Camera aria-hidden="true" size={16} strokeWidth={1.8} />
+                </span>
+                <span>暂无镜头</span>
+              </div>
+            ) : (
+              aiPromptEntries.map((entry) => (
+                <div
+                  key={entry.shotId}
+                  style={{
+                    marginBottom: "20px",
+                    padding: "12px",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "6px",
+                    backgroundColor: "rgba(0,0,0,0.2)",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "8px" }}>
+                    <h3 style={{ fontSize: "14px", fontWeight: 600, margin: 0 }}>{entry.shotName}</h3>
+                    <button
+                      aria-label={copiedShotId === entry.shotId ? "已复制" : "复制提示词"}
+                      className="top-bar-action-button"
+                      type="button"
+                      onClick={() => void copyPromptText(entry)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        fontSize: "12px",
+                        padding: "4px 8px",
+                      }}
+                    >
+                      <ClipboardCopy aria-hidden="true" size={14} strokeWidth={1.8} />
+                      <span>{copiedShotId === entry.shotId ? "已复制" : "复制"}</span>
+                    </button>
+                  </div>
+                  <p
+                    style={{
+                      fontSize: "13px",
+                      lineHeight: "1.5",
+                      color: "rgba(255,255,255,0.85)",
+                      margin: "0 0 8px 0",
+                      padding: "8px",
+                      backgroundColor: "rgba(0,0,0,0.3)",
+                      borderRadius: "4px",
+                      fontFamily: "monospace",
+                    }}
+                  >
+                    {entry.promptText}
+                  </p>
+                  <details style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)" }}>
+                    <summary style={{ cursor: "pointer", userSelect: "none" }}>查看结构化参数</summary>
+                    <pre
+                      style={{
+                        marginTop: "8px",
+                        padding: "8px",
+                        backgroundColor: "rgba(0,0,0,0.4)",
+                        borderRadius: "4px",
+                        fontSize: "11px",
+                        overflowX: "auto",
+                      }}
+                    >
+                      {JSON.stringify(entry.structuredParams, null, 2)}
+                    </pre>
+                  </details>
+                </div>
+              ))
+            )}
           </div>
         </div>
       ) : null}

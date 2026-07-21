@@ -1,6 +1,6 @@
 import "./styles/index.css";
 import { useEffect, useState } from "react";
-import { ArrowDown, ArrowRight, BookOpen, Boxes, Check, Clock3, Hand, House, Keyboard, MousePointer2, Plus, Route, Sparkles, Trash2, Users, X } from "lucide-react";
+import { ArrowDown, ArrowRight, BookOpen, Boxes, Check, Clock3, Hand, House, Keyboard, MousePointer2, Plus, Route, Sparkles, Trash2, X } from "lucide-react";
 import { DirectorDeskShell } from "./app/layout/DirectorDeskShell";
 import { DirectorCanvas } from "./editor/canvas/DirectorCanvas";
 import { ViewportSensitivitySettings } from "./editor/canvas/ViewportSensitivitySettings";
@@ -46,14 +46,6 @@ const HOME_RELEASE_NOTES = [
   "看成片时可随时暂停和拖动底部时间轴，不会再退出第一视角预览",
   "主成片 FOV 与监看小窗 FOV 已分开设置，导出使用主成片 FOV",
   "新增可拖动实时监看小窗、MP4 参考视频导出和更可靠的撤销逻辑",
-] as const;
-
-const HOME_COMMUNITY_CONTRIBUTORS = [
-  {
-    name: "AIGC 耀光",
-    douyinId: "AIJPDM001",
-    contribution: "群友镜头预设构想与共创反馈",
-  },
 ] as const;
 
 const HOME_CONTROL_GROUPS = [
@@ -420,24 +412,6 @@ export default function App() {
               <li key={note}><Check aria-hidden="true" size={15} /><span>{note}</span></li>
             ))}
           </ul>
-        </section>
-
-        <section className="director-home-contributors" aria-labelledby="director-home-contributors-title">
-          <header className="director-home-section-heading">
-            <span><Users aria-hidden="true" size={16} />群友贡献</span>
-            <div>
-              <h2 id="director-home-contributors-title">共同完善 3D 导演台</h2>
-              <p>感谢群友提供真实工作流、镜头构想和使用反馈。</p>
-            </div>
-          </header>
-          <dl className="director-home-contributor-list">
-            {HOME_COMMUNITY_CONTRIBUTORS.map((contributor) => (
-              <div key={contributor.douyinId}>
-                <dt>{contributor.name}</dt>
-                <dd><span>{contributor.contribution}</span><strong>抖音号：{contributor.douyinId}</strong></dd>
-              </div>
-            ))}
-          </dl>
         </section>
 
         <section className="director-home-controls" aria-labelledby="director-home-controls-title">
