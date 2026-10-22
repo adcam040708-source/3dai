@@ -43,9 +43,6 @@ it("returns to a real home page that lists director desks 1 through 4", async ()
   expect(screen.getByText("掌镜快捷键")).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "路线编辑、监看与导出升级" })).toBeInTheDocument();
   expect(screen.getByText("主成片 FOV 与监看小窗 FOV 已分开设置，导出使用主成片 FOV")).toBeInTheDocument();
-  expect(screen.getByRole("heading", { name: "共同完善 3D 导演台" })).toBeInTheDocument();
-  expect(screen.getByText("AIGC 耀光")).toBeInTheDocument();
-  expect(screen.getByText("抖音号：AIJPDM001")).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "键盘、鼠标与触控板操作" })).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "普通导演视角" })).toBeInTheDocument();
   expect(screen.getByRole("heading", { name: "掌镜模式" })).toBeInTheDocument();

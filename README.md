@@ -2,8 +2,9 @@
 
 一个在浏览器中运行的 3D 运镜与分镜工具。你可以摆放人物、道具和生活模型，为人物或物体制作动作，再像玩第一人称游戏一样用 `WASD` 走镜头、记录轨迹点并预演成片。
 
-- 在线体验：<https://xiaozangao.github.io/3d-director-desk/>
-- 源代码：<https://github.com/xiaozangao/3d-director-desk>
+- 当前仓库：<https://github.com/adcam040708-source/3dai>
+- 上游在线体验：<https://xiaozangao.github.io/3d-director-desk/>（不包含本机尚未发布的改动）
+- 上游来源及保留声明：见 `UPSTREAM.md` 与 `LICENSE`。
 
 ![3D 导演台界面示例](images/06.png)
 
@@ -24,6 +25,21 @@
 ## 群友贡献
 
 - `AIGC 耀光`，抖音号：`AIJPDM001`：提供群友镜头预设构想与共创反馈。
+
+## 本地 AI 视频工作流完善 2026-10-11
+
+打开视口工具栏的“导出 AI 提示词”，即可使用新的 AI 视频提示词面板：
+
+- 按运镜与人物路线的真实到达、停留和离开时间生成中文分段提示词。
+- 按画幅和相机视野采样入画主体，保留人物动作、朝向、道具运动、FOV 与跟踪设置。
+- 支持通用视频提示词与 Seedance 导演格式；参考视频模式明确素材用途，并提示视频尚未上传。
+- 可补充镜头内容、人物外观、场景、风格、声音和约束，复制提示词或下载 TXT / JSON。
+- 从同一面板导出选中机位的参考 MP4，然后自行上传到视频生成平台。固定镜头也需记录两个相同机位的点。
+- 生成完成后展开“生成验证与对比记录”，填写实际模型、提示词、结果编号、尝试次数和三项评分，并下载记录备份。
+
+本次完善没有添加模型 API 调用。参考视频上传和 AI 生成在所选平台完成。入画范围采用近似包围球并按时间采样，不包含遮挡判断；骨骼跟踪和防抖以参考视频为准。使用方式、数据字段和毕业设计对比实验方法见 [`docs/ai-video-workflow.md`](docs/ai-video-workflow.md)。
+
+工程 JSON 与提示词 JSON 是不同文件：导出的 `shot-prompts.json` 用于下游创作，不能作为导演台工程导入。
 
 ## v0.3.0 更新（2026-07-18）
 
@@ -73,8 +89,8 @@
 Windows 和 macOS 使用同一套命令。先下载项目：
 
 ```bash
-git clone https://github.com/xiaozangao/3d-director-desk.git
-cd 3d-director-desk
+git clone https://github.com/adcam040708-source/3dai.git
+cd 3dai
 ```
 
 第一次运行需要安装依赖：

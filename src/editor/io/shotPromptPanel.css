@@ -1,0 +1,97 @@
+.shot-prompt-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(var(--overlay-rgb) / 0.65);
+}
+
+.shot-prompt-dialog {
+  width: min(1120px, 100%);
+  height: min(820px, calc(100vh - 48px));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid rgb(var(--border-rgb));
+  border-radius: 14px;
+  color: rgb(var(--text-rgb));
+  background: rgb(var(--panel-rgb));
+  box-shadow: var(--ui-shadow-panel);
+  font-size: 13px;
+}
+
+.shot-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgb(var(--border-rgb));
+}
+
+.shot-prompt-header h2 { margin: 0 0 6px; font-size: 20px; }
+.shot-prompt-header p { margin: 0; color: rgb(var(--text-muted-rgb)); }
+.shot-prompt-layout { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 0; flex: 1; }
+.shot-prompt-settings, .shot-prompt-results { min-height: 0; overflow-y: auto; padding: 20px 24px; }
+.shot-prompt-settings { border-right: 1px solid rgb(var(--border-rgb)); background: rgb(var(--surface-rgb) / 0.5); }
+.shot-prompt-settings label { display: grid; gap: 7px; margin-bottom: 16px; font-weight: 500; }
+.shot-prompt-settings select, .shot-prompt-settings textarea, .shot-prompt-preview {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid rgb(var(--border-rgb));
+  border-radius: 7px;
+  padding: 9px 10px;
+  background: rgb(var(--field-rgb));
+  color: rgb(var(--text-rgb));
+  font-weight: 400;
+  line-height: 1.65;
+  resize: vertical;
+}
+.shot-prompt-settings textarea::placeholder { color: rgb(var(--text-muted-rgb)); }
+.shot-prompt-help { color: rgb(var(--text-muted-rgb)); font-size: 12px; line-height: 1.7; }
+.shot-prompt-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.shot-prompt-dialog button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid rgb(var(--border-rgb));
+  border-radius: 7px;
+  padding: 9px 11px;
+  color: rgb(var(--text-rgb));
+  background: rgb(var(--surface-rgb));
+}
+.shot-prompt-dialog button:hover:not(:disabled) { background: rgb(var(--surface-hover-rgb)); }
+.shot-prompt-dialog button:disabled { cursor: default; opacity: 0.45; }
+.shot-prompt-actions button:first-child { color: white; background: rgb(var(--accent-rgb)); border-color: transparent; }
+.shot-prompt-actions button:first-child:hover:not(:disabled) { background: rgb(var(--accent-hover-rgb)); }
+.shot-prompt-entry { margin-top: 24px; padding-top: 18px; border-top: 1px solid rgb(var(--border-rgb)); }
+.shot-prompt-entry-title { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.shot-prompt-entry-title h3 { font-size: 15px; margin: 0; }
+.shot-prompt-entry-title span { font-size: 12px; color: rgb(var(--text-muted-rgb)); }
+.shot-prompt-preview { min-height: 300px; font-size: 13px; }
+.shot-prompt-entry details { margin-top: 14px; line-height: 1.8; }
+.shot-prompt-entry summary { cursor: pointer; }
+.shot-prompt-entry ul { margin: 8px 0; padding-left: 20px; color: rgb(var(--text-muted-rgb)); font-size: 12px; }
+.shot-prompt-entry pre { max-height: 320px; overflow: auto; padding: 12px; border-radius: 7px; background: rgb(var(--field-rgb)); font-size: 11px; }
+.shot-prompt-status { color: rgb(var(--accent-rgb)); line-height: 1.7; }
+.shot-experiment-panel { margin-top: 24px; padding-top: 18px; border-top: 1px solid rgb(var(--border-rgb)); }
+.shot-experiment-panel summary { cursor: pointer; font-weight: 600; }
+.shot-experiment-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.shot-experiment-panel label { display: grid; gap: 6px; font-size: 12px; }
+.shot-experiment-panel input, .shot-experiment-panel select, .shot-experiment-panel textarea {
+  width: 100%; min-width: 0; padding: 8px; border: 1px solid rgb(var(--border-rgb)); border-radius: 6px;
+  color: rgb(var(--text-rgb)); background: rgb(var(--field-rgb)); resize: vertical;
+}
+.shot-experiment-prompt { margin: 14px 0; }
+.shot-experiment-records { padding-left: 18px; font-size: 12px; line-height: 1.8; color: rgb(var(--text-muted-rgb)); }
+@media (max-width: 760px) {
+  .shot-prompt-backdrop { padding: 8px; }
+  .shot-prompt-dialog { height: calc(100dvh - 16px); }
+  .shot-prompt-layout { display: block; overflow-y: auto; }
+  .shot-prompt-settings, .shot-prompt-results { overflow: visible; padding: 16px; }
+  .shot-prompt-settings { border-right: 0; border-bottom: 1px solid rgb(var(--border-rgb)); }
+  .shot-prompt-header { padding: 16px; }
+}
